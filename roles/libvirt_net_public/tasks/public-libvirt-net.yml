@@ -1,9 +1,4 @@
 # https://docs.ansible.com/ansible/latest/collections/community/libvirt/virt_net_module.html
-#
-# CLI commands
-# virsh net-define file.xml
-# virsh net-start "{{ public_libvirt_name }}"
-# virsh net-autostart "{{ public_libvirt_name }}"
 
 - name: install RPM packages
   dnf:

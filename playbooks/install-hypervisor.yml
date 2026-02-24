@@ -9,7 +9,7 @@
 # see the README in iso_rhel_download 
 
 - name: Build new hypervisor
-  hosts: hypervisor
+  hosts: '{{target|default("all")}}'
   become: true
   gather_facts: true
   vars_files:

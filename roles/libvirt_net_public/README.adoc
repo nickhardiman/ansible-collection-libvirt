@@ -19,9 +19,11 @@ These are more isolated, but not totally private.
 They can be reached if a route to the host is added to the workstation.
 
 
-== rhel-system-roles.network
+== tasks calling rhel-system-roles.network
 
+An example playbook is included with the RPM, here. 
 /usr/share/doc/rhel-system-roles/network/example-bridge_with_vlan-playbook.yml
+
 creates a few things.
 
 ----
@@ -39,7 +41,7 @@ the bridge to the outside world already exists.
 
 The libvirt modules are better behaved.
 
-== CLI equivalents of rhel-system-roles.network
+== CLI equivalents of calls to rhel-system-roles.network
 
 These CLI commands do something similar.
  
@@ -68,6 +70,19 @@ delete
 ----
   sudo nmcli con delete brpublic-enp2s0f0
   sudo nmcli con delete brpublic
+----
+
+
+== tasks calling community.libvirt.virt_net
+
+https://docs.ansible.com/ansible/latest/collections/community/libvirt/virt_net_module.html
+
+== CLI equivalents of calls to community.libvirt.virt_net
+
+----
+ virsh net-define net-public.xml
+ virsh net-start "{{ public_libvirt_name }}"
+ virsh net-autostart "{{ public_libvirt_name }}"
 ----
 
 == Requirements

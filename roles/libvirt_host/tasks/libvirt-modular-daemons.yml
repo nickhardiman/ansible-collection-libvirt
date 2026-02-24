@@ -2,11 +2,13 @@
 # tasks file
 # reference
 # systemctl commands to start libvirt modular daemons
-# https://libvirt.org/daemons.html#switching-to-modular-daemons
+#   https://libvirt.org/daemons.html#switching-to-modular-daemons
 # network descriptions
-# https://wiki.libvirt.org/VirtualNetworking.html
+#   https://wiki.libvirt.org/VirtualNetworking.html
 # virtualization on RHEL 9
-# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/index
+#   https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/index
+# check these on the command line 
+#   systemctl  | grep ' virt'
 
 # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dnf_module.html
 - name: Install the 'Virtualization Host' environment group and friends

@@ -1,26 +1,9 @@
 #
 # /usr/share/doc/rhel-system-roles/network/example-bridge_with_vlan-playbook.yml 
-# These tasks creates a few things.
-#   brpublic0              linux bridge
-#   bridge-public0          bridge
-#   bridge-public0-enp2s0f0 ethernet
-#
-# These CLI commands do something similar. 
-#   # create a bridge device
-#   nmcli con add ifname brpublic0 type bridge
-#   nmcli con up brpublic0
-#   # connect ethernet port to bridge
-#   nmcli con down enp2s0f0
-#   nmcli con add type bridge-slave ifname enp2s0f0 master brpublic0
-#   nmcli con up brpublic0
-# check
-#   ip -brief link show type bridge
-#   ip route
-#   nmcli con
-#   nmcli device status
-# delete                      
-#   sudo nmcli con delete brpublic0-enp2s0f0
-#   sudo nmcli con delete brpublic0
+# creates a few things like this.
+#   brpublic              linux bridge
+#   bridge-public          bridge
+#   bridge-public-enp2s0f0 ethernet
 
 - name: Install RPM package
   dnf:
@@ -37,7 +20,7 @@
     var: ethernet_port
 
 # requires gather_facts to set ansible_python
-# no convinced this is doing "nmcli con up bridge-public0"
+# no convinced this is doing "nmcli con up bridge-public"
 - name: use rhel-system-role network
   vars:
     network_connections:
