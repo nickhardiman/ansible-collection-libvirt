@@ -1,0 +1,93 @@
+---
+# tasks file for iso_rhel_download
+
+# For more information about the authorization token, see the bootstrap.sh script.
+# https://github.com/nickhardiman/ansible-playbook-source/blob/main/bootstrap.sh#L59
+
+- name: Copy offline token from environment variable
+  ansible.builtin.set_fact:
+    offline_token: "{{ lookup('ansible.builtin.env', 'OFFLINE_TOKEN') }}"
+
+- name: Display token if verbose
+  ansible.builtin.debug:
+    verbosity: 1
+    var: offline_token
+
+- name: Display token if verbose
+  ansible.builtin.debug:
+    verbosity: 1
+    var: jwt_red_hat_api
+
+# Generating an access token
+- name: 'Authenticate on the Red Hat Portal'
+  ansible.builtin.uri:
+    url: '{{ redhat_token_url }}'
+    return_content: true
+    method: 'POST'
+    body_format: 'form-urlencoded'
+    body:
+      grant_type: 'refresh_token'
+      client_id: 'rhsm-api'
+      refresh_token: '{{ jwt_red_hat_api }}'
+  register: r_request_refresh_token
+  no_log: "{{ ansible_verbosity < 1 }}"
+
+- name: Display reply if verbose
+  ansible.builtin.debug:
+    verbosity: 1
+    var: r_request_refresh_token
+
+- name: Copy access token from the reply
+  ansible.builtin.set_fact:
+    access_token: '{{ r_request_refresh_token.json.access_token }}'
+
+
+# get ISO details
+
+- name: 'Ensure download directory exists: {{ download_directory }}'
+  ansible.builtin.file:
+    path: '{{ download_directory }}'
+    state: 'directory'
+
+- name: 'Gather information about the ISO to download'
+  ansible.builtin.uri:
+    url: '{{ download_href }}'
+    method: 'GET'
+    follow_redirects: 'none'
+    status_code: 307
+    headers:
+      Accept: '*/*'
+      Authorization: 'Bearer {{ access_token }}'
+  register: r_iso_information
+
+- name: Display reply if verbose
+  ansible.builtin.debug:
+    verbosity: 1
+    var: r_iso_information
+
+- name: 'Set fact: Extract filename of the ISO to download'
+  ansible.builtin.set_fact:
+    iso_filename: '{{ r_iso_information.json.body.filename }}'
+
+# download 
+
+# !!! why not extract checksum from URL?
+# eg. copy 65da7744b9e41ba064627762fd7378c66b77008ec8ab026f1c8c2cf72a86a92b from
+# https://api.access.redhat.com/management/v1/images/65da7744b9e41ba064627762fd7378c66b77008ec8ab026f1c8c2cf72a86a92b/download
+
+# Task downloads to a temporary file, something like 
+#   /home/ansible_user/.ansible/tmp/ansible-tmp-1693932672.055527-43704-15290345689509/tmpu7fo8za
+# then copies to the final location. 
+# owner (root), permissions (644) and SELinux file type (virt_image_t) shouldn't need work.
+- name: 'Download to {{ download_directory }}/{{ iso_filename }}, timeout in {{ download_timeout }} seconds'
+  ansible.builtin.get_url:
+    url: '{{ download_href }}'
+    dest: '{{ download_directory }}/{{ iso_filename }}'
+    headers:
+      Accept: '*/*'
+      Authorization: 'Bearer {{ access_token }}'
+    # owner: '{{ _iso_owner }}'
+    # group: '{{ _iso_group }}'
+    # mode: '{{ _iso_mode }}'
+    checksum: 'sha256:{{ checksum_sha256 }}'
+    timeout: '{{ download_timeout }}'

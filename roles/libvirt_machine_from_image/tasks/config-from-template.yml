@@ -1,0 +1,19 @@
+
+- name: Define VM config template file name
+  ansible.builtin.set_fact:
+    vm_config_template: "{{ osinfo }}.xml"
+
+- name: "Read template config from '{{ vm_config_template }}'"
+  ansible.builtin.set_fact:
+    vm_config_xml: "{{ lookup('template', vm_config_template) }}"
+
+- name: "Display VM config for {{ vm_name }}"
+  ansible.builtin.debug:
+    msg: "{{ vm_config_xml }}"
+    verbosity: 1
+
+- name: "Copy rendered template to '{{ work_dir }}/'"
+  ansible.builtin.template:
+    src: "{{ vm_config_template }}"
+    dest: "{{ work_dir }}/"
+

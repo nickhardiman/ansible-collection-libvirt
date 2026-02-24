@@ -1,0 +1,8 @@
+= Ansible Collection - nickhardiman.libvirt
+
+Attempts at installing and using libvirt
+
+https://libvirt.org/
+
+Uses the real deal here. 
+https://docs.ansible.com/projects/ansible/latest/collections/community/libvirt/index.html

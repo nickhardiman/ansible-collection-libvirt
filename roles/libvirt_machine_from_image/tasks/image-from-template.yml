@@ -1,0 +1,18 @@
+# !!! using shell cp, not module
+# this struggles with large image file copy
+# - name: Copy the cached storage file
+#   ansible.builtin.copy:
+#      src: "/var/lib/libvirt/images/{{ fqdn }}-base.qcow2"
+#      remote_src: yes
+#      dest: "/var/lib/libvirt/images/{{ fqdn }}.qcow2"
+#      owner: qemu
+#      group: qemu
+#      mode: '0644'
+
+- name: Copy the cached storage file
+  ansible.builtin.command:
+    cmd: >
+        cp
+        "{{ libvirt_pool_dir }}/template-{{ osinfo }}.qcow2"
+        "{{ libvirt_pool_dir }}/{{ fqdn }}.qcow2"
+    creates: "{{ libvirt_pool_dir }}/{{ fqdn }}.qcow2"

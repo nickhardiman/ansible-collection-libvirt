@@ -1,0 +1,32 @@
+= libvirt_machine_instance, an Ansible role
+
+
+----
+- name: Create a VM from an image
+  hosts: hypervisor
+  become: true
+  gather_facts: false
+  vars_files:
+    - ~/vault-credentials.yml
+
+  tasks:
+    - name: Hosts to build
+      ansible.builtin.set_fact:
+        hosts_to_build: "{{ groups[hostvars[inventory_hostname]['vm_group']] }}"
+
+
+    - name: "On hypervisor {{ inventory_hostname }}"
+      ansible.builtin.include_role: 
+        name: nickhardiman.hypervisor.libvirt_machine_from_image
+      vars:
+        fqdn: "{{ item }}"
+        vm_config_template: rhel-6-from-cockpit.xml
+        osinfo: rhel6.10
+      loop: "{{ hosts_to_build }}"
+----
+
+----
+ansible-playbook  --vault-pass-file ~/my-vault-pass  --inventory inventories/inventory-site3-single-host.ini  playbooks/vm-from-image.yml -v 
+----
+
+
