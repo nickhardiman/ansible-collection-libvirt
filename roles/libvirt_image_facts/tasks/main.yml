@@ -12,17 +12,13 @@
 - name: Look for the machine base volume.
   ansible.builtin.include_tasks:
     file: check_host.yml
-  loop: "{{ groups[ hostvars[inventory_hostname]['vm_group'] ] }}"
 
-- name: Display new 'volume_image_file_exists' variables
+- name: Display new 'volume_image_file_exists' variable
   ansible.builtin.debug:
     verbosity: 1
-    msg: "hostvars['{{ item }}']['volume_image_file_exists']: {{ hostvars[item]['volume_image_file_exists'] }}"
-  loop: "{{ groups[ hostvars[inventory_hostname]['vm_group'] ] }}"
+    msg: "hostvars['{{ fqdn }}']['volume_image_file_exists']: {{ hostvars[fqdn]['volume_image_file_exists'] }}"
 
-- name: Display new 'volume_base_file_exists' variables
+- name: Display new 'volume_base_file_exists' variable
   ansible.builtin.debug:
     verbosity: 1
-    msg: "hostvars['{{ item }}']['volume_base_file_exists']: {{ hostvars[item]['volume_base_file_exists'] }}"
-  loop: "{{ groups[ hostvars[inventory_hostname]['vm_group'] ] }}"
-
+    msg: "hostvars['{{ fqdn }}']['volume_base_file_exists']: {{ hostvars[fqdn]['volume_base_file_exists'] }}"
