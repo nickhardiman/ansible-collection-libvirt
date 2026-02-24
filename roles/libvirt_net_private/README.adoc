@@ -21,6 +21,23 @@ the bridge to the outside world already exists.
 
 The libvirt modules are better behaved.
 
+delete the private bridge
+
+----
+  sudo nmcli con delete bridge-lab
+  sudo nmcli con delete brpublic
+----
+
+delete libvirt's config 
+
+sudo virsh net-undefine netlab
+Network netlab0 has been undefined
+
+----
+sudo virsh net-destroy netlab
+sudo virsh net-undefine netlab
+----
+
 == Requirements
 
 
@@ -31,8 +48,11 @@ Two sets - public and lab.
 
 == Dependencies
 
+RHEL: 
 rhel_system_roles
 
+Fedora: 
+linux_system_roles
 
 == Example Playbook
 
