@@ -2,7 +2,6 @@
 
 # !!! move to libvirt-storage
 - include_tasks: pool-images.yml
-# CDN changed, this approach no longer works.
-#- include_tasks: download-ISO.yml
-# Do something based on download-ISO.sh
+# ISO download moved to iso_rhel_download
+
 

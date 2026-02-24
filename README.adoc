@@ -6,3 +6,27 @@ https://libvirt.org/
 
 Uses the real deal here. 
 https://docs.ansible.com/projects/ansible/latest/collections/community/libvirt/index.html
+
+
+
+
+== Requirements
+
+== Variables
+
+== Dependencies
+
+== Example Playbook
+
+----
+    - hosts: all
+      roles:
+         - ansible-role-template
+----
+
+== License
+
+See license.md
+
+== Author Information
+

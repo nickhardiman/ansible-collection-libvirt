@@ -1,0 +1,33 @@
+---
+# !!! hangs on first network reconfig. 
+# might need 
+#   - name: Reset connection
+#     meta: reset_connection
+# in nickhardiman.libvirt.libvirt_net_public
+
+# For instructions on finding checksum and URL, 
+# see the README in iso_rhel_download 
+
+- name: Build new hypervisor
+  hosts: hypervisor
+  become: true
+  gather_facts: true
+  vars_files:
+    - ~/vault-credentials.yml
+  roles:
+    - role: nickhardiman.libvirt.libvirt_host
+    - role: nickhardiman.libvirt.libvirt_storage
+    - role: nickhardiman.libvirt.libvirt_net_public
+    - role: nickhardiman.libvirt.libvirt_net_private
+    # download Red Hat Enterprise Linux 9.4 Binary DVD
+    - role: nickhardiman.libvirt.iso_rhel_download
+      vars: 
+        checksum_sha256: '398561d7b66f1a4bf23664f4aa8f2cfbb3641aa2f01a320068e86bd1fc0e9076'
+        download_href: 'https://api.access.redhat.com/management/v1/images/398561d7b66f1a4bf23664f4aa8f2cfbb3641aa2f01a320068e86bd1fc0e9076/download'
+    # download Red Hat Enterprise Linux 8.9 Binary DVD
+    - role: nickhardiman.libvirt.iso_rhel_download
+      vars: 
+        checksum_sha256: 'c4fd0632ce15a7d56e1d174176456943bd48306f9d35bcecbcb0a1dc49088e23'
+        download_href: 'https://api.access.redhat.com/management/v1/images/c4fd0632ce15a7d56e1d174176456943bd48306f9d35bcecbcb0a1dc49088e23/download'
+    # download RHEL 7.9 DVD ISO and earlier
+    # see https://access.redhat.com/downloads/content/rhel 

@@ -1,25 +1,74 @@
-= libvirt_net
+= libvirt_net_public and libvirt_net_private
 
+Add network things to the hypervisor host.
 Create linux bridges and associated libvirt network config. 
+Create a bridge, attach the default interface, and add libvirt config.
+Assume a simple machine with only one ethernet port.
+
+== public bridge 
 
 One bridge is public, for traffic going in and out of Virtual Machines. 
-The public network in my case is my workstation and a home network with a route to the Internet. 
+The public network in my case is a home network with a route to the Internet. 
+The host network interface is attached to the public bridge. 
+Assume a simple machine with only one ethernet port.
+
+== private bridge 
 
 The other bridge is private, for lab VMs. 
 These are more isolated, but not totally private. 
 They can be reached if a route to the host is added to the workstation.
 
-The host network interface is attached to the public bridge. 
-Assume a simple machine with only one ethernet port.
 
-The network role is not the idempotent role model it shoud be. 
+== rhel-system-roles.network
+
+/usr/share/doc/rhel-system-roles/network/example-bridge_with_vlan-playbook.yml
+creates a few things.
+
+----
+  brpublic               linux bridge
+  bridge-public          bridge
+  bridge-public-enp2s0f0 ethernet
+----
+
+The network role is not the idempotent role model it shoud be.
 It can disconnect ports from an existing bridge.
 Work around this with a bridge check.
-If the default IPv4 interface name is pubbr0 rather than something like enp2s0f0, 
+If the default IPv4 interface name is brpublic rather than something like enp2s0f0,
 assume this work has already been done and
 the bridge to the outside world already exists.
 
 The libvirt modules are better behaved.
+
+== CLI equivalents of rhel-system-roles.network
+
+These CLI commands do something similar.
+ 
+ ----
+  # create a bridge device
+  nmcli con add ifname brpublic type bridge
+  nmcli con up brpublic
+  # connect ethernet port to bridge
+  nmcli con down enp2s0f0
+  nmcli con add type bridge-slave ifname enp2s0f0 master brpublic
+  nmcli con up brpublic
+----
+
+check
+
+----
+  ip -brief link show type bridge
+  ip route
+  nmcli con
+  nmcli device status
+  sysctl net.ipv4.ip_forward
+----
+
+delete
+
+----
+  sudo nmcli con delete brpublic-enp2s0f0
+  sudo nmcli con delete brpublic
+----
 
 == Requirements
 
