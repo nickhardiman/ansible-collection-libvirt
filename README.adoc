@@ -24,6 +24,21 @@ https://docs.ansible.com/projects/ansible/latest/collections/community/libvirt/i
          - ansible-role-template
 ----
 
+
+Run an included playbook like this. 
+
+----
+ansible-playbook nickhardiman.libvirt.install_hypervisor.yml
+----
+
+ISO downloads require an "offline token" (or refresh token).
+Put this in vault-credentials.yml, then 
+
+----
+ansible-playbook --extra-vars=@~/vault-credentials.yml --vault-pass-file=~/my-vault-pass nickhardiman.libvirt.install_hypervisor.yml
+----
+
+
 == License
 
 See license.md

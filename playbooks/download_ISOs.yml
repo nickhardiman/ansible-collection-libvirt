@@ -1,24 +1,14 @@
 ---
-# !!! hangs on first network reconfig. 
-# might need 
-#   - name: Reset connection
-#     meta: reset_connection
-# in nickhardiman.libvirt.libvirt_net_public
-
 # For instructions on finding checksum and URL, 
 # see the README in iso_rhel_download 
 
-- name: Build new hypervisor
+- name: Downlod ISO files for building VMs
   hosts: '{{target|default("all")}}'
   become: true
   gather_facts: true
   vars_files:
     - ~/vault-credentials.yml
   roles:
-    - role: nickhardiman.libvirt.libvirt_host
-    - role: nickhardiman.libvirt.libvirt_storage
-    - role: nickhardiman.libvirt.libvirt_net_public
-    - role: nickhardiman.libvirt.libvirt_net_private
     # download Red Hat Enterprise Linux 9.4 Binary DVD
     - role: nickhardiman.libvirt.iso_rhel_download
       vars: 

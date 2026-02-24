@@ -1,7 +1,7 @@
 # Create bridge and nmcli connection config.
 # For CLI equivalents, see comments in public-linux-bridge.yml
 
-- name: create a bridge using rhel-system-role network
+- name: Set up the private bridge
   vars:
     network_connections:
       - name: "{{ lab_nmcli_name }}"
@@ -12,6 +12,8 @@
           address:
           - "{{ lab_bridge_ip_cidr }}"
         #mac: "{{ lab_bridge_mac }}"
-  include_role:
-    name: rhel-system-roles.network
-
+  ansible.builtin.include_role:
+    # RHEL
+    # name: rhel-system-roles.network
+    # Fedora
+    name: linux-system-roles.network

@@ -3,14 +3,14 @@
 
 - name: Find the default network interface name
   ansible.builtin.set_fact:
-    ethernet_port: "{{ ansible_facts['default_ipv4']['interface'] }}"
+    libvirt_net_public_ethernet_port: "{{ ansible_facts['default_ipv4']['interface'] }}"
 - name: Display the default network interface name
   ansible.builtin.debug:
-    var: ethernet_port
+    var: libvirt_net_public_ethernet_port
 
 - name: "Define the public bridge {{ public_bridge_name }}"
   ansible.builtin.include_tasks: public-linux-bridge.yml
-  when: ethernet_port != public_bridge_name
+  when: libvirt_net_public_ethernet_port != public_bridge_name
 
 - name: "Define the libvirt network {{ public_libvirt_name }}"
   ansible.builtin.include_tasks: public-libvirt-net.yml

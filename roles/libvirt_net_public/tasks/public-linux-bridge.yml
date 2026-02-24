@@ -11,17 +11,17 @@
     state: present
 
 # Assume a simple machine with only one ethernet port.
-- name: find the network interface name
+- name: Find the network interface name
   set_fact:
-    ethernet_port: "{{ ansible_facts['default_ipv4']['interface'] }}"
+    libvirt_net_public_ethernet_port: "{{ ansible_facts['default_ipv4']['interface'] }}"
 
-- name: display the interface name
+- name: Display the interface name
   debug:
-    var: ethernet_port
+    var: libvirt_net_public_ethernet_port
 
 # requires gather_facts to set ansible_python
 # no convinced this is doing "nmcli con up bridge-public"
-- name: use rhel-system-role network
+- name: Set up the public bridge
   vars:
     network_connections:
       #
@@ -32,15 +32,18 @@
         # interface_name defaults to the connection name
         interface_name: "{{ public_bridge_name }}"
         ip:
-          dhcp4: yes
-          auto6: yes
+          dhcp4: true
+          auto6: true
       #
       # set an ethernet port to the bridge
-      - name: "{{ public_nmcli_name }}-{{ ethernet_port }}"
+      - name: "{{ public_nmcli_name }}-{{ libvirt_net_public_ethernet_port }}"
         state: up
         type: ethernet
-        interface_name: "{{ ethernet_port }}"
+        interface_name: "{{ libvirt_net_public_ethernet_port }}"
         controller: "{{ public_nmcli_name }}"
         port_type: bridge
-  include_role:
-    name: rhel-system-roles.network
+  ansible.builtin.include_role:
+    # RHEL
+    # name: rhel-system-roles.network
+    # Fedora
+    name: linux-system-roles.network
