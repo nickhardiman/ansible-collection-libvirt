@@ -2,6 +2,13 @@
 
 Create a libvirt volume.
 
+. check variables
+. define the guest - create a kickstart file and virt-install shell script
+. create the guest - run the script
+. wait for install to complete.
+. clean up
+. Fail if no storage volume was created.
+
 If the new VM is  named "kvm-guest.lab.example.com", then the role creates these resources. 
 Playbook _tests/no-kvm-guest.yml_ deletes them. 
 

@@ -1,17 +1,21 @@
 ---
 # defaults file 
 
-kickstart_path: "/var/tmp"
+kickstart_path: "{{ work_dir }} | default('/var/tmp')"
 kickstart_file: "{{ fqdn }}.ks"
-# user_admin_password: "{{ default_password }}"
-# user_ansible_password: "{{ default_password }}"
-# user_root_password: "{{ default_password }}"
 user_root_password_encrypted:    "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl ' + user_root_password  | quote ) }}"
 user_admin_password_encrypted:   "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl ' + user_admin_password  | quote ) }}"
 user_ansible_password_encrypted: "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl ' + user_ansible_password  | quote ) }}"
 
+# required, but not defined here
+
 # The role expects to get these variables from hostvars and vault.
-# They are used in the kicstart template.
+# They are used in the kickstart template.
+
+# These are used in 'user_*_password_encrypted' above
+# user_admin_password: "{{ default_password }}"
+# user_ansible_password: "{{ default_password }}"
+# user_root_password: "{{ default_password }}"
 
 # # compute
 # cpus: 2

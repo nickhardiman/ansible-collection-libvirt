@@ -1,5 +1,21 @@
 ---
+# check variables
+# define the guest - create a kickstart file and virt-install shell script
+# create the guest - run the script
+# wait for install to complete.
+# clean up
+# Fail if no storage volume was created.
 
+# !!! create the guest fails when disk already exists.
+# Could do with a module to compare VM against requested state.
+# assume a failure means the storage file is created and cached
+
+# !!! create the guest may need a 5 second sleep
+# got this 
+# error while evaluating conditional (r_virt_status['status'] == 'shutdown'): 
+# 'dict object' has no attribute 'status'.
+
+# check variables
 - name: "TEST {{ inventory_hostname }} {{ fqdn }}"
   ansible.builtin.debug:
     var: l_var
@@ -45,10 +61,6 @@
 
 
 # create the guest
-#
-# !!! fails when disk already exists.
-# Could do with a module to compare VM against requested state.
-# assume a failure means the storage file is created and cached
 - name: Create
   ansible.builtin.command:
     cmd: "{{ kickstart_path }}/{{ fqdn }}-install.sh"
@@ -63,9 +75,6 @@
   when: not hostvars[fqdn]['volume_image_file_exists']
 
 
-# !!! sleep here?
-# error while evaluating conditional (r_virt_status['status'] == 'shutdown'): 
-# 'dict object' has no attribute 'status'.
 
 # wait for install to complete.
 # time out after 20 retries * 30 seconds = 10 minutes

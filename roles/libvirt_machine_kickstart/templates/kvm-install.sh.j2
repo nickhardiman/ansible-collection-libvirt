@@ -2,6 +2,7 @@
   
 virt-install   \
   --name="{{ fqdn }}"  \
+  --boot uefi \
   --vcpus="{{ hostvars[fqdn]['cpus'] }}"  \
   --ram="{{ hostvars[fqdn]['ram'] }}"  \
   --disk="path=/var/lib/libvirt/images/{{ fqdn }}.qcow2,bus=virtio,size={{ hostvars[fqdn]['disk_size'] }},sparse=yes"  \
