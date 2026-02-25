@@ -9,28 +9,23 @@
 # don't overwrite it.
 
 # check for a cached storage base file.
-- name: Look for the machine base volume.
+- name: Look for the VM base volume.
   ansible.builtin.stat:
     path: "/var/lib/libvirt/images/{{ fqdn }}-base.qcow2"
     get_checksum: false
   register: r_volume_base
 
-- name: "does the volume '/var/lib/libvirt/images/{{ fqdn }}-base.qcow2' already exist?"
+- name: "Record result for '/var/lib/libvirt/images/{{ fqdn }}-base.qcow2'"
   ansible.builtin.set_fact:
     volume_base_file_exists: "{{ r_volume_base.stat.exists | bool }}"
-  delegate_to: "{{ fqdn }}"
-  delegate_facts: true
-
 
 # check for an image file.
-- name: Look for the machine image volume.
+- name: Look for the VM image volume.
   ansible.builtin.stat:
     path: "/var/lib/libvirt/images/{{ fqdn }}.qcow2"
     get_checksum: false
   register: r_volume_image
 
-- name: "Does the volume '/var/lib/libvirt/images/{{ fqdn }}.qcow2' already exist?"
+- name: "Record result for '/var/lib/libvirt/images/{{ fqdn }}.qcow2'"
   ansible.builtin.set_fact:
     volume_image_file_exists: "{{ r_volume_image.stat.exists | bool }}"
-  delegate_to: "{{ fqdn }}"
-  delegate_facts: true

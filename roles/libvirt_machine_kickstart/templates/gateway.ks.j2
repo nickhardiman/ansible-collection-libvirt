@@ -1,4 +1,5 @@
 # kickstart file
+# from Ansible jinja2 template gateway.ks.j2
 # Kickstart guide is here.
 # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/performing_an_advanced_rhel_9_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user#kickstart-commands-for-system-configuration_kickstart-commands-and-options-reference
 # This tool creates a kickstart file. 
@@ -23,7 +24,7 @@ keyboard --vckeymap=gb
 # network
 # from Ansible group_vars and host_vars
 network --device=enp1s0 --bootproto=dhcp --ipv6=auto --activate
-network --device=enp2s0 --bootproto=static --ip={{ hostvars[fqdn]['nics'][1]['ip'] }} --netmask=255.255.255.0 --gateway={{ hostvars[fqdn]['lab_net_prefix'] }}.1 --nodefroute --activate
+network --device=enp2s0 --bootproto=static --ip={{ nics[1]['ip'] }} --netmask=255.255.255.0 --gateway={{ lab_net_prefix }}.1 --nodefroute --activate
 network  --hostname={{ fqdn }}
 
 
@@ -48,10 +49,10 @@ ignoredisk --only-use=vda
 clearpart --all --initlabel
 part /boot/efi --fstype="efi"   --ondisk=vda --size=600 --fsoptions="umask=0077,shortname=winnt"
 part /boot     --fstype="xfs"   --ondisk=vda --size=1024
-part pv.03     --fstype="lvmpv" --ondisk=vda --size={{ hostvars[fqdn]['pv_size'] }}
+part pv.03     --fstype="lvmpv" --ondisk=vda --size={{ pv_size }}
 volgroup rhel pv.03
-logvol /       --fstype="xfs"  --size={{ hostvars[fqdn]['lv_root'] }}  --name=root --vgname=rhel
-logvol /var    --fstype="xfs"  --size={{ hostvars[fqdn]['lv_var'] }}   --name=var  --vgname=rhel
+logvol /       --fstype="xfs"  --size={{ lv_root }}  --name=root --vgname=rhel
+logvol /var    --fstype="xfs"  --size={{ lv_var }}   --name=var  --vgname=rhel
 logvol swap    --fstype="swap" --size=256    --name=swap --vgname=rhel
 
 # applications and services 
@@ -60,7 +61,7 @@ skipx
 services --enabled="chronyd"
 selinux --enforcing
 # open firewall
-{% set service_options = " --service=" ~ hostvars[fqdn]['net_services']|join(" --service=") %}
+{% set service_options = " --service=" ~ net_services | join(" --service=") %}
 firewall --enabled {{ service_options }}
 
 # after installing the OS
@@ -97,7 +98,7 @@ tree
 # This package is for creating a server private key.
 python3-cryptography
 # These packages are required for applications.
-{% for package in hostvars[fqdn]['RPMs'] %}
+{% for package in RPMs %}
 {{ package }}
 {% endfor %}
 %end

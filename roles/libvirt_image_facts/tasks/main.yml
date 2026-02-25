@@ -13,12 +13,12 @@
   ansible.builtin.include_tasks:
     file: check_host.yml
 
-- name: Display new 'volume_image_file_exists' variable
+- name: "Does the volume '/var/lib/libvirt/images/{{ fqdn }}.qcow2' already exist?"
   ansible.builtin.debug:
     verbosity: 1
-    msg: "hostvars['{{ fqdn }}']['volume_image_file_exists']: {{ hostvars[fqdn]['volume_image_file_exists'] }}"
+    msg: "volume_image_file_exists: {{ volume_image_file_exists }}"
 
-- name: Display new 'volume_base_file_exists' variable
+- name: "Does the base volume '/var/lib/libvirt/images/{{ fqdn }}.qcow2' already exist?"
   ansible.builtin.debug:
     verbosity: 1
-    msg: "hostvars['{{ fqdn }}']['volume_base_file_exists']: {{ hostvars[fqdn]['volume_base_file_exists'] }}"
+    msg: "volume_base_file_exists: {{ volume_base_file_exists }}"
