@@ -40,7 +40,7 @@ ram: 8192
 # storage
 # default 30GB disk
 # size in GiB
-# disk_size: 30
+disk_size: 30
 # Add up the sizes below and make sure they fit in the disk_size.
 # partitions
 # 1 for /boot/efi                600M

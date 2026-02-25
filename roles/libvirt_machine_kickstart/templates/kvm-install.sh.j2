@@ -4,7 +4,7 @@ virt-install   \
   --name="{{ fqdn }}"  \
   --boot uefi \
   --vcpus="{{ cpus }}"  \
-  --ram="{{ ram'}}"  \
+  --ram="{{ ram }}"  \
   --disk="path=/var/lib/libvirt/images/{{ fqdn }}.qcow2,bus=virtio,size={{ disk_size }},sparse=yes"  \
   --os-variant="{{ os_variant }}"  \
 {% for nic in nics %}
