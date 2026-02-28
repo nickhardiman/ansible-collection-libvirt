@@ -3,7 +3,7 @@
 # Install and configure the OS using a kickstart file.
 #
 # Requires an enormous number of vars.
-# See roles/libvirt_machine_kickstart/defaults/main.yml
+# See roles/machine_kickstart/defaults/main.yml
 #
 # Override role defaults on the CLI
 # ----
@@ -39,6 +39,6 @@
   tasks:
     - name: "Kickstart VM on hypervisor {{ inventory_hostname }}"
       ansible.builtin.include_role:
-        name: nickhardiman.libvirt.libvirt_machine_kickstart
+        name: nickhardiman.libvirt.machine_kickstart
       vars:
         fqdn: gateway.example.com
