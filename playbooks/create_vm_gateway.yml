@@ -26,7 +26,8 @@
   # vars_files:
   #   - ~/vault-credentials.yml
   roles:
-  - role: nickhardiman.libvirt.kickstart_file
+  - name: Create kickstart file
+    role: nickhardiman.libvirt.kickstart_file
     vars:
       kickstart_file_template: "gateway.ks.j2"
       kickstart_file_path: "/var/tmp"
@@ -83,7 +84,8 @@
         # LVM logical volume for /var   13G * 1024 = 13312M
         lv_var: 13312
   
-  - role: nickhardiman.libvirt.kickstart_install
+  - name: Run virt-install
+    role: nickhardiman.libvirt.kickstart_install
     vars:
       kickstart_install_config:
         fqdn: gateway.silvan.uk

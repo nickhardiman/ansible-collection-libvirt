@@ -1,16 +1,16 @@
 #!/usr/bin/bash  
   
 virt-install   \
-  --name="{{ fqdn }}"  \
+  --name="{{ kickstart_install_config['fqdn'] }}"  \
   --boot uefi \
-  --vcpus="{{ cpus }}"  \
-  --ram="{{ ram }}"  \
-  --disk="path=/var/lib/libvirt/images/{{ fqdn }}.qcow2,bus=virtio,size={{ disk_size }},sparse=yes"  \
-  --os-variant="{{ os_variant }}"  \
-{% for nic in nics %}
-  --network="network={{ nic.net }},mac={{ nic.mac }}"  \
+  --vcpus="{{ kickstart_install_config['cpus'] }}"  \
+  --ram="{{ kickstart_install_config['ram'] }}"  \
+  --disk="path=/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2,bus=virtio,size={{ kickstart_install_config['disk_size'] }},sparse=yes"  \
+  --os-variant="{{ kickstart_install_config['os_variant'] }}"  \
+{% for nic in kickstart_install_config['nics'] %}
+  --network="network={{ nic['net'] }},mac={{ nic['mac'] }}"  \
 {% endfor %}
-  --location="{{ install_iso }}"  \
-  --initrd-inject="{{ kickstart_file_path }}/{{ kickstart_file_name }}"  \
-  --extra-args "inst.ks=file:/{{ kickstart_file_name }} console=tty0 console=ttyS0,115200"   \
+  --location="{{ kickstart_install_config['install_iso'] }}"  \
+  --initrd-inject="{{ kickstart_install_config['kickstart_file_path'] }}/{{ kickstart_install_config['kickstart_file_name'] }}"  \
+  --extra-args "inst.ks=file:/{{ kickstart_install_config['kickstart_file_name'] }} console=tty0 console=ttyS0,115200"   \
   --noautoconsole

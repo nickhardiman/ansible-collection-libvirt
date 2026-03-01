@@ -7,35 +7,35 @@
 # fix
 # echo "remember_owner = 0" >>  /etc/libvirt/qemu.conf
 
-# !!! risky mix of fqdn and inventory_hostname
+# !!! risky mix of start_domain_name and inventory_hostname
 
-- name: "Start VM {{ fqdn }}"
+- name: "Start VM {{ start_domain_name }}"
   community.libvirt.virt:
-    name: "{{ fqdn }}"
+    name: "{{ start_domain_name }}"
     state: running
 
 # check
 # These tasks use libvirt only.
 # They don't check anything at the OS level, such as waiting for a connection. 
 
-- name: "Get domain info for {{ fqdn }}"
+- name: "Get domain info for {{ start_domain_name }}"
   community.libvirt.virt:
-    name: "{{ fqdn }}"
+    name: "{{ start_domain_name }}"
     command: info
   register: r_domain_info
 
 - name: display domain info
   ansible.builtin.debug:
-    var: r_domain_info[fqdn]
+    var: r_domain_info[start_domain_name]
 
 # These tasks are targeting the hypervisor. 
 # That's no good here. 
 # We're not interested in the hypervisor being pingable. 
 # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/wait_for_connection_module.html
-- name: "Wait for VM {{ fqdn }} to respond to a ping"
+- name: "Wait for VM {{ start_domain_name }} to respond to a ping"
   ansible.builtin.wait_for_connection:
     delay: 10
     timeout: 120
   become: no
-  delegate_to: "{{ fqdn }}"
+  delegate_to: "{{ start_domain_name }}"
   when: wait_for_ping

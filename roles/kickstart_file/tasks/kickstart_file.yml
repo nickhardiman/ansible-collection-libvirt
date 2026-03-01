@@ -17,10 +17,10 @@
 
 # define 
 
-- name: "Make kickstart file for VM {{ fqdn }}, {{ inventory_hostname }}:{{ kickstart_file_path }}/{{ kickstart_file_name }}"
+- name: "Make kickstart file for VM {{ kickstart_file_config['fqdn'] }} on {{ inventory_hostname }}:{{ kickstart_file_config['kickstart_file_path'] }}/{{ kickstart_file_config['kickstart_file_name'] }}"
   ansible.builtin.template:
-    src: "{{ kickstart_file_template }}"
-    dest: "{{ kickstart_file_path }}/{{ kickstart_file_name }}"
+    src: "{{ kickstart_file_config['kickstart_file_template'] }}"
+    dest: "{{ kickstart_file_config['kickstart_file_path'] }}/{{ kickstart_file_config['kickstart_file_name'] }}"
     owner: root
     group: root
     mode: '0644'

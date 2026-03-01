@@ -24,7 +24,7 @@ keyboard --vckeymap=gb
 # network
 # from Ansible group_vars and host_vars
 network --device=enp1s0 --bootproto=dhcp --ipv6=auto --activate
-network --device=enp2s0 --bootproto=static --ip={{ kickstart_file_config['nics[1]['ip'] }} --netmask=255.255.255.0 --gateway={{ kickstart_file_config['lab_net_prefix'] }}.1 --nodefroute --activate
+network --device=enp2s0 --bootproto=static --ip={{ kickstart_file_config['nics'][1]['ip'] }} --netmask=255.255.255.0 --gateway={{ kickstart_file_config['lab_net_prefix'] }}.1 --nodefroute --activate
 network  --hostname={{ kickstart_file_config['fqdn'] }}
 
 

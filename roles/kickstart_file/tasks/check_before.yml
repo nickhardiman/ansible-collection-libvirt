@@ -3,18 +3,15 @@
 
 - name: "Check values for building {{ kickstart_file_config['fqdn'] }} on {{ inventory_hostname }}"
   ansible.builtin.debug:
-    var: l_var
-    verbosity: 1
-  loop:
-  - "{{ kickstart_file_template }}"
-  - "{{ kickstart_file_path }}"
-  - "{{ kickstart_file_name }}"
-  - "{{ kickstart_file_config['fqdn'] }}"
-  - "{{ kickstart_file_config['user_ansible_name'] }}"
-  - "{{ kickstart_file_config['user_ansible_public_key'] }}"
-  - "{{ kickstart_file_config['user_admin_public_key'] }}"
-  - "{{ kickstart_file_config['nics'] }}"
-  - "{{ kickstart_file_config['rpms'] }}"
-  - "{{ kickstart_file_config['net_services'] }}"
-  loop_control:
-    loop_var: l_var
+    msg: 
+      - "kickstart_file_config['kickstart_file_template'] {{ kickstart_file_config['kickstart_file_template'] }}"
+      - "kickstart_file_config['kickstart_file_path']     {{ kickstart_file_config['kickstart_file_path'] }}"
+      - "kickstart_file_config['kickstart_file_name']     {{ kickstart_file_config['kickstart_file_name'] }}"
+      - "kickstart_file_config['fqdn']                    {{ kickstart_file_config['fqdn'] }}"
+      - "kickstart_file_config['user_ansible_name']       {{ kickstart_file_config['user_ansible_name'] }}"
+      - "kickstart_file_config['user_ansible_public_key'] {{ kickstart_file_config['user_ansible_public_key'] }}"
+      - "kickstart_file_config['user_admin_public_key']   {{ kickstart_file_config['user_admin_public_key'] }}"
+      - "kickstart_file_config['nics']                    {{ kickstart_file_config['nics'] }}"
+      - "kickstart_file_config['rpms']                    {{ kickstart_file_config['rpms'] }}"
+      - "kickstart_file_config['net_services']            {{ kickstart_file_config['net_services'] }}"
+

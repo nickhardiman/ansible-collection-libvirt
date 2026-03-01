@@ -1,3 +1,4 @@
 ---
 # defaults file 
 wait_for_ping: true
+start_domain_name: kshost.example.com

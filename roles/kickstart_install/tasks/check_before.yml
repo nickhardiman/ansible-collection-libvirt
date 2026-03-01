@@ -2,70 +2,61 @@
 # check variables
 # check for images
 # check for a cached storage base file.
-#   "/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}-base.qcow2"
+#   "/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}-base.qcow2"
 # don't bother reinstalling if it exists.
 # check for an image file.
-#   "/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}.qcow2"
+#   "/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2"
 # don't overwrite it.
 
-- name: "TEST {{ inventory_hostname }} {{ fqdn }}"
+- name: "Check variables for virt-install command"
   ansible.builtin.debug:
-    var: l_var
-    verbosity: 1
-  loop:
-  - "{{ kickstart_image_config['fqdn'] }}"
-  - "{{ kickstart_image_config['volume_image_file_exists'] }}"
-  - "{{ kickstart_image_config['volume_base_file_exists'] }}"
-  - "{{ kickstart_image_config['kickstart_file_path'] }}"
-  - "{{ kickstart_image_config['kickstart_file_name'] }}"
-  - "{{ kickstart_image_config['user_ansible_name'] }}"
-  - "{{ kickstart_image_config['user_ansible_public_key'] }}"
-  - "{{ kickstart_image_config['user_admin_public_key'] }}"
-  - "{{ kickstart_image_config['kickstart_file_template'] }}"
-  - "{{ kickstart_image_config['nics'] }}"
-  - "{{ kickstart_image_config['rpms'] }}"
-  - "{{ kickstart_image_config['net_services'] }}"
-  loop_control:
-    loop_var: l_var
-
-
-- name: "If VM image exists, stop play here"
-  ansible.builtin.fail:
-    msg: >-
-      Storage volume already exists, won't overwrite: 
-      /var/lib/libvirt/images/{{ fqdn }}.qcow2
-  when: volume_image_file_exists
-
+    msg: 
+      - "kickstart_install_config['kickstart_file_path']     {{ kickstart_install_config['kickstart_file_path'] }}"
+      - "kickstart_install_config['kickstart_file_name']     {{ kickstart_install_config['kickstart_file_name'] }}"
+      - "kickstart_install_config['fqdn']                    {{ kickstart_install_config['fqdn'] }}"
+      - "kickstart_install_config['cpus']                    {{ kickstart_install_config['cpus'] }}"
+      - "kickstart_install_config['ram']                     {{ kickstart_install_config['ram'] }}"
+      - "kickstart_install_config['disk_size']               {{ kickstart_install_config['disk_size'] }}"
+      - "kickstart_install_config['nics']                    {{ kickstart_install_config['nics'] }}"
+      - "kickstart_install_config['install_iso']             {{ kickstart_install_config['install_iso'] }}"
+      - "kickstart_install_config['os_variant']              {{ kickstart_install_config['os_variant'] }}"
 
 
 # check for a cached storage base file.
 - name: Look for the VM base volume.
   ansible.builtin.stat:
-    path: "/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}-base.qcow2"
+    path: "/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}-base.qcow2"
     get_checksum: false
   register: r_volume_base
 
-- name: "Record result for '/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}-base.qcow2'"
+- name: "Record result for '/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}-base.qcow2'"
   ansible.builtin.set_fact:
     volume_base_file_exists: "{{ r_volume_base.stat.exists | bool }}"
 
 # check for an image file.
 - name: Look for the VM image volume.
   ansible.builtin.stat:
-    path: "/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}.qcow2"
+    path: "/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2"
     get_checksum: false
   register: r_volume_image
 
-- name: "Record result for '/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}.qcow2'"
+- name: "Record result for '/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2'"
   ansible.builtin.set_fact:
     volume_image_file_exists: "{{ r_volume_image.stat.exists | bool }}"
 
-- name: "Does the volume '/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}.qcow2' already exist?"
+- name: "Does the volume '/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2' already exist?"
   ansible.builtin.debug:
     verbosity: 1
     msg: "volume_image_file_exists: {{ volume_image_file_exists }}"
 
-- name: "Does the base volume '/var/lib/libvirt/images/{{ kickstart_image_config['fqdn'] }}.qcow2' already exist?"
+- name: "Does the base volume '/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2' already exist?"
   ansible.builtin.debug:
     verbosity: 1
     msg: "volume_base_file_exists: {{ volume_base_file_exists }}"
+
+- name: "If VM image exists, stop play here"
+  ansible.builtin.fail:
+    msg: >-
+      Storage volume already exists, won't overwrite: 
+      /var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2
+  when: volume_image_file_exists
