@@ -11,6 +11,6 @@ virt-install   \
   --network="network={{ nic.net }},mac={{ nic.mac }}"  \
 {% endfor %}
   --location="{{ install_iso }}"  \
-  --initrd-inject="{{ kickstart_path }}/{{ kickstart_file }}"  \
-  --extra-args "inst.ks=file:/{{ kickstart_file }} console=tty0 console=ttyS0,115200"   \
+  --initrd-inject="{{ kickstart_file_path }}/{{ kickstart_file_name }}"  \
+  --extra-args "inst.ks=file:/{{ kickstart_file_name }} console=tty0 console=ttyS0,115200"   \
   --noautoconsole

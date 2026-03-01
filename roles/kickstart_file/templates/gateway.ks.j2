@@ -24,8 +24,8 @@ keyboard --vckeymap=gb
 # network
 # from Ansible group_vars and host_vars
 network --device=enp1s0 --bootproto=dhcp --ipv6=auto --activate
-network --device=enp2s0 --bootproto=static --ip={{ nics[1]['ip'] }} --netmask=255.255.255.0 --gateway={{ lab_net_prefix }}.1 --nodefroute --activate
-network  --hostname={{ fqdn }}
+network --device=enp2s0 --bootproto=static --ip={{ kickstart_file_config['nics[1]['ip'] }} --netmask=255.255.255.0 --gateway={{ kickstart_file_config['lab_net_prefix'] }}.1 --nodefroute --activate
+network  --hostname={{ kickstart_file_config['fqdn'] }}
 
 
 
@@ -38,9 +38,9 @@ eula --agreed
 # from the Ansible vault
 # These commands set up password-based login.
 # for key-based login, check out 'sshkey --username=user "ssh_key"'.
-rootpw                                       --iscrypted "{{ user_root_password_encrypted }}"
-user --groups=wheel --name={{ user_admin_name }}   --password="{{ user_admin_password_encrypted }}" --iscrypted --gecos="{{ user_admin_name }}"
-user --groups=wheel --name={{ user_ansible_name }} --password="{{ user_ansible_password_encrypted }}" --iscrypted --gecos="{{ user_ansible_name }}"
+rootpw                                       --iscrypted "{{ kickstart_file_config['user_root_password_encrypted'] }}"
+user --groups=wheel --name={{ kickstart_file_config['user_admin_name'] }}   --password="{{ kickstart_file_config['user_admin_password_encrypted'] }}" --iscrypted --gecos="{{ kickstart_file_config['user_admin_name'] }}"
+user --groups=wheel --name={{ kickstart_file_config['user_ansible_name'] }} --password="{{ kickstart_file_config['user_ansible_password_encrypted'] }}" --iscrypted --gecos="{{ kickstart_file_config['user_ansible_name'] }}"
 
 # storage 
 # All these partitions must fit in the storage volume.
@@ -49,10 +49,10 @@ ignoredisk --only-use=vda
 clearpart --all --initlabel
 part /boot/efi --fstype="efi"   --ondisk=vda --size=600 --fsoptions="umask=0077,shortname=winnt"
 part /boot     --fstype="xfs"   --ondisk=vda --size=1024
-part pv.03     --fstype="lvmpv" --ondisk=vda --size={{ pv_size }}
+part pv.03     --fstype="lvmpv" --ondisk=vda --size={{ kickstart_file_config['pv_size'] }}
 volgroup rhel pv.03
-logvol /       --fstype="xfs"  --size={{ lv_root }}  --name=root --vgname=rhel
-logvol /var    --fstype="xfs"  --size={{ lv_var }}   --name=var  --vgname=rhel
+logvol /       --fstype="xfs"  --size={{ kickstart_file_config['lv_root'] }}  --name=root --vgname=rhel
+logvol /var    --fstype="xfs"  --size={{ kickstart_file_config['lv_var'] }}   --name=var  --vgname=rhel
 logvol swap    --fstype="swap" --size=256    --name=swap --vgname=rhel
 
 # applications and services 
@@ -61,7 +61,7 @@ skipx
 services --enabled="chronyd"
 selinux --enforcing
 # open firewall
-{% set service_options = " --service=" ~ net_services | join(" --service=") %}
+{% set service_options = " --service=" ~ kickstart_file_config['net_services'] | join(" --service=") %}
 firewall --enabled {{ service_options }}
 
 # after installing the OS
@@ -98,7 +98,7 @@ tree
 # This package is for creating a server private key.
 python3-cryptography
 # These packages are required for applications.
-{% for package in RPMs %}
+{% for package in kickstart_file_config['rpms'] %}
 {{ package }}
 {% endfor %}
 %end
@@ -116,45 +116,45 @@ python3-cryptography
 # !!! put this in a loop
 # admin user
 # key-based login
-mkdir -m0700 /home/{{ user_admin_name }}/.ssh/
-cat <<EOF >/home/{{ user_admin_name }}/.ssh/authorized_keys
-{{ user_admin_public_key }}
+mkdir -m0700 /home/{{ kickstart_file_config['user_admin_name'] }}/.ssh/
+cat <<EOF >/home/{{ kickstart_file_config['user_admin_name'] }}/.ssh/authorized_keys
+{{ kickstart_file_config['user_admin_public_key'] }}
 EOF
 # fix ownership and permissions
-chown -R {{ user_admin_name }}:{{ user_admin_name }} /home/{{ user_admin_name }}/.ssh
-chmod 0600 /home/{{ user_admin_name }}/.ssh/authorized_keys
+chown -R {{ kickstart_file_config['user_admin_name'] }}:{{ kickstart_file_config['user_admin_name'] }} /home/{{ kickstart_file_config['user_admin_name'] }}/.ssh
+chmod 0600 /home/{{ kickstart_file_config['user_admin_name'] }}/.ssh/authorized_keys
 # fix up selinux context
-restorecon -vR /home/{{ user_admin_name }}/.ssh/
+restorecon -vR /home/{{ kickstart_file_config['user_admin_name'] }}/.ssh/
 # Allow passwordless sudo.
-echo "{{ user_admin_name }}      ALL=(ALL)       NOPASSWD: ALL" > /etc/sudoers.d/{{ user_admin_name }}
+echo "{{ kickstart_file_config['user_admin_name'] }}      ALL=(ALL)       NOPASSWD: ALL" > /etc/sudoers.d/{{ kickstart_file_config['user_admin_name'] }}
 # CLI prompt. Also see "better_prompt" here:
 # https://github.com/nickhardiman/ansible-playbook-aap2-refarch/blob/main/files/aap-bootstrap-1-ssh-sudo.sh
-echo "PS1='[\u@\H \W]$ '" >> /home/{{ user_admin_name }}/.bashrc
+echo "PS1='[\u@\H \W]$ '" >> /home/{{ kickstart_file_config['user_admin_name'] }}/.bashrc
 
 # ansible user
 # key-based login
-mkdir -m0700 /home/{{ user_ansible_name }}/.ssh/
-cat <<EOF >/home/{{ user_ansible_name }}/.ssh/authorized_keys
-{{ user_ansible_public_key }}
-{{ user_admin_public_key }}
+mkdir -m0700 /home/{{ kickstart_file_config['user_ansible_name'] }}/.ssh/
+cat <<EOF >/home/{{ kickstart_file_config['user_ansible_name'] }}/.ssh/authorized_keys
+{{ kickstart_file_config['user_ansible_public_key'] }}
+{{ kickstart_file_config['user_admin_public_key'] }}
 EOF
 # fix ownership and permissions
-chown -R {{ user_ansible_name }}:{{ user_ansible_name }} /home/{{ user_ansible_name }}/.ssh
-chmod 0600 /home/{{ user_ansible_name }}/.ssh/authorized_keys
+chown -R {{ kickstart_file_config['user_ansible_name'] }}:{{ kickstart_file_config['user_ansible_name'] }} /home/{{ kickstart_file_config['user_ansible_name'] }}/.ssh
+chmod 0600 /home/{{ kickstart_file_config['user_ansible_name'] }}/.ssh/authorized_keys
 # fix up selinux context
-restorecon -vR /home/{{ user_ansible_name }}/.ssh/
+restorecon -vR /home/{{ kickstart_file_config['user_ansible_name'] }}/.ssh/
 # Allow passwordless sudo.
-echo "{{ user_ansible_name }}      ALL=(ALL)       NOPASSWD: ALL" > /etc/sudoers.d/{{ user_ansible_name }}
+echo "{{ kickstart_file_config['user_ansible_name'] }}      ALL=(ALL)       NOPASSWD: ALL" > /etc/sudoers.d/{{ kickstart_file_config['user_ansible_name'] }}
 # CLI prompt. Also see "better_prompt" here:
 # https://github.com/nickhardiman/ansible-playbook-aap2-refarch/blob/main/files/aap-bootstrap-1-ssh-sudo.sh
-echo "PS1='[\u@\H \W]$ '" >> /home/{{ user_ansible_name }}/.bashrc
+echo "PS1='[\u@\H \W]$ '" >> /home/{{ kickstart_file_config['user_ansible_name'] }}/.bashrc
 
 # root user
 # key-based login
 mkdir -m0700 /root/.ssh/
 cat <<EOF >/root/.ssh/authorized_keys
-{{ user_ansible_public_key }}
-{{ user_admin_public_key }}
+{{ kickstart_file_config['user_ansible_public_key'] }}
+{{ kickstart_file_config['user_admin_public_key'] }}
 EOF
 chmod 0600 /root/.ssh/authorized_keys
 # fix up selinux context

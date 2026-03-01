@@ -16,16 +16,6 @@
 #  playbooks/vm-kickstart.yml
 # ----
 
-# create a few variables like "volume_image_file_exists"
-- name: Add image facts to hostvars
-  hosts: hypervisor
-  become: true
-  gather_facts: false
-  roles:
-    - name: "check for existing images"
-      role: nickhardiman.libvirt.libvirt_image_facts
-      vars:
-        fqdn: gateway.example.com
 
 # !!! If there already is an image file, don't trash it. 
 
@@ -36,9 +26,88 @@
   # vars_files:
   #   - ~/vault-credentials.yml
   roles:
-  tasks:
-    - name: "Kickstart VM on hypervisor {{ inventory_hostname }}"
-      ansible.builtin.include_role:
-        name: nickhardiman.libvirt.machine_kickstart
-      vars:
-        fqdn: gateway.example.com
+  - role: nickhardiman.libvirt.kickstart_file
+    vars:
+      kickstart_file_template: "gateway.ks.j2"
+      kickstart_file_path: "/var/tmp"
+      kickstart_file_name: "{{ fqdn }}.ks"
+      kickstart_file_config:  
+        # network
+        lab_net_prefix: "192.168.134"
+        nics:
+          -
+            name: enp1s0
+            mac: "{{ public_mac_prefix }}:00:03"
+            net: "{{ public_libvirt_name }}"
+            # IP comes from the public network's DHCP service
+            # eg. 192.168.1.234
+          -
+            name: enp2s0
+            mac: "{{ lab_mac_prefix }}:00:03"
+            net: "{{ lab_libvirt_name }}"
+            # IP is static
+            ip: "{{ lab_net_prefix }}.3"
+        net_services:
+          - dns
+          - http
+          - https
+          - ssh
+        fqdn: gateway.silvan.uk
+        # apps
+        rpms:
+          - cockpit
+          - httpd
+          - squid
+          - bind
+        # accounts
+        # names and passwords are from vault
+        user_root_password_encrypted:    "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl My_root_password' | quote ) }}"
+        user_admin_name: my_user
+        user_admin_password_encrypted:   "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl My_user_password' | quote ) }}"
+        user_admin_public_key: "ssh-ed25519 1234567890ABCDEFT1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF012 vboxuser@rhelvm"
+        user_ansible_name: my_ansible_user
+        user_ansible_password_encrypted: "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl My_ansible_password' | quote ) }}"
+        user_ansible_public_key: "ssh-ed25519 1234567890ABCDEFT1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF012 vboxuser@rhelvm"
+        # storage
+        # default 30GB disk
+        # size in GiB
+        disk_size: 30
+        # Add up the sizes below and make sure they fit in the disk_size.
+        # partitions
+        # 1 for /boot/efi                600M
+        # 2 for /boot                    1024M
+        # 3 LVM Physical Volume          28G * 1024 = 28672M
+        pv_size: 28672
+        # LVM logical volume for /root   13G * 1024 = 13312M
+        lv_root: 13312
+        # LVM logical volume for /var   13G * 1024 = 13312M
+        lv_var: 13312
+  
+  - role: nickhardiman.libvirt.kickstart_install
+    vars:
+      kickstart_install_config:
+        fqdn: gateway.silvan.uk
+        cpus: 2
+        ram: 4096                           # size in MiB (4G * 1024 = 4096M)
+        disk_size: 30                       # size in GiB
+        nics:
+          -
+            name: enp1s0
+            mac: "52:54:00:00:00:03"
+            net: netpublic
+            # IP comes from the public network's DHCP service
+            # eg. 192.168.1.234
+          -
+            name: enp2s0
+            mac: "52:54:00:02:00:03"
+            net: netlab
+            # IP is static
+            ip: "192.168.134.3"
+        install_iso: /var/lib/libvirt/images/rhel-10.1-x86_64-dvd.iso
+        # Use this command to get the list of accepted OS variants.
+        #  virt-install --osinfo list
+        os_variant: rhel10.1
+        kickstart_file_path: "/var/tmp"
+        kickstart_file_name: "{{ fqdn }}.ks"
+
+  - role: nickhardiman.libvirt.machine_start

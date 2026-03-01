@@ -1,0 +1,64 @@
+---
+# defaults file 
+
+# The role expects to get some variables from vault and passed in vars.
+# They are used in the kickstart template.
+
+# host and lab network
+hostname: gateway
+lab_domain: example.com
+fqdn: "{{ hostname }}.{{ lab_domain }}"
+lab_mac_prefix: "52:54:00:02"
+lab_net_short_name: lab
+lab_libvirt_name: "net{{ lab_net_short_name }}"
+
+# kickstart
+# playbook copies kvm-guest.ks to /var/tmp/
+# !!! replace /var/tmp with a temporary ansible working directory
+kickstart_file_path: "/var/tmp"
+kickstart_file_template: kvm-guest.ks.j2
+kickstart_file_name: "{{ fqdn }}.ks"
+
+# all these variables are present in gateway.ks.j2
+# --------
+kickstart_file_config:
+  # network
+  lab_net_prefix: "192.168.134"
+  nics:
+    name: enp1s0
+    mac: "{{ lab_mac_prefix }}:00:99"
+    ip: "{{ lab_net_prefix }}.99"     # IP is static
+    net: "{{ lab_libvirt_name }}"
+    gw: "{{ lab_net_prefix }}.1"
+  net_services:
+    - http
+    - https
+  fqdn: "{{ fqdn }}"
+  # apps
+  rpms:
+    - httpd
+    - mod_ssl
+  # accounts
+  # names and passwords are from vault
+  user_root_password_encrypted:    "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl ' + user_root_password  | quote ) }}"
+  user_admin_name: "{{ user_admin_name }}"
+  user_admin_password_encrypted:   "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl ' + user_admin_password  | quote ) }}"
+  user_admin_public_key: ssh-ed25519 1234567890ABCDEFT1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF012 vboxuser@rhelvm
+  user_ansible_name: "{{ user_ansible_name }}"
+  user_ansible_password_encrypted: "{{ lookup('ansible.builtin.pipe', '/usr/bin/openssl passwd  -6 --salt=G3GIlnUH.JqcrAQl ' + user_ansible_password  | quote ) }}"
+  user_ansible_public_key: ssh-ed25519 1234567890ABCDEFT1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF012 vboxuser@rhelvm
+  # storage
+  # default 30GB disk
+  # size in GiB
+  disk_size: 30
+  # Add up the sizes below and make sure they fit in the disk_size.
+  # partitions
+  # 1 for /boot/efi                600M
+  # 2 for /boot                    1024M
+  # 3 LVM Physical Volume          28G * 1024 = 28672M
+  pv_size: 28672
+  # LVM logical volume for /root   13G * 1024 = 13312M
+  lv_root: 13312
+  # LVM logical volume for /var   13G * 1024 = 13312M
+  lv_var: 13312
+# --------

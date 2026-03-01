@@ -1,0 +1,21 @@
+---
+# Fail if no storage volume was created.
+
+- name: "Check if image file was created: /var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2" 
+  ansible.builtin.stat:
+    path: "/var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2"
+    get_checksum: false
+  register: r_qcow2
+#
+- name: Fail if image file was not created
+  ansible.builtin.fail:
+    msg: "Storage volume was not created: /var/lib/libvirt/images/{{ kickstart_install_config['fqdn'] }}.qcow2"
+  when: not r_qcow2.stat.exists
+
+- name: Display update
+  ansible.builtin.debug:
+    msg: "VM {{ kickstart_install_config['fqdn'] }} on {{ inventory_hostname }} is installed and shutdown"
+
+- name: There is now an image file
+  ansible.builtin.set_fact:
+    volume_image_file_exists: true

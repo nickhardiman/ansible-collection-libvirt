@@ -1,0 +1,5 @@
+---
+
+- ansible.builtin.include_tasks: check_before.yml
+- ansible.builtin.include_tasks: virt_install.yml
+- ansible.builtin.include_tasks: check_after.yml

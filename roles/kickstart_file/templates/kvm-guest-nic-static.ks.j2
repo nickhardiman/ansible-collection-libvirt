@@ -97,7 +97,7 @@ tree
 # This package is for creating a server private key.
 python3-cryptography
 # These packages are required for applications.
-{% for package in hostvars[fqdn]['RPMs'] %}
+{% for package in hostvars[fqdn]['rpms'] %}
 {{ package }}
 {% endfor %}
 %end

@@ -1,0 +1,54 @@
+---
+# define the guest - create a virt-install shell script
+# create the guest - run the script
+# wait for install to complete.
+# clean up
+# Fail if no storage volume was created.
+
+# define the guest
+# kickstart file is here: "{{ kickstart_file_path }}/{{ kickstart_file_name }}"
+
+- name: "Make install script for {{ fqdn }}, {{ inventory_hostname }}:{{ kickstart_file_path }}/{{ fqdn }}-install.sh"
+  ansible.builtin.template:
+    src: kvm-install.sh.j2
+    dest: "{{ kickstart_file_path }}/{{ fqdn }}-install.sh"
+    owner: root
+    group: root
+    mode: '0744'
+
+# create the guest
+
+- name: Create
+  ansible.builtin.command:
+    cmd: "{{ kickstart_file_path }}/{{ fqdn }}-install.sh"
+  register: r_virt_install
+  changed_when: r_virt_install.rc == 0
+  ignore_errors: true
+
+- name: Display virt-install result
+  ansible.builtin.debug:
+    var: r_virt_install
+
+# wait for install to complete.
+
+# time out after 20 retries * 30 seconds = 10 minutes
+- name: "Wait up to 10 minutes for install and shut down of {{ fqdn }}"
+  community.libvirt.virt:
+    command: status
+    name: "{{ fqdn }}"
+  register: r_virt_status
+  until: r_virt_status['status'] == 'shutdown'
+  retries: 20
+  delay: 30
+
+# clean up
+
+- name: Remove temporary files
+  ansible.builtin.file:
+    name: "{{ l_file }}"
+    state: absent
+  loop:
+    - "{{ kickstart_file_path }}/{{ kickstart_file_name }}"
+    - "{{ kickstart_file_path }}/{{ fqdn }}-install.sh"
+  loop_control:
+    loop_var: l_file
