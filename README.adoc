@@ -1,12 +1,8 @@
 = Ansible Collection - nickhardiman.libvirt
 
-Attempts at installing and using libvirt
+Yet another refactor of my home lab automation
 
-https://libvirt.org/
-
-Uses the real deal here. 
-https://docs.ansible.com/projects/ansible/latest/collections/community/libvirt/index.html
-
+== third attempt, RHEL lab 
 
 WIP
 
@@ -17,45 +13,29 @@ take the AAP2 work and break up into less choking chunks
 * https://github.com/nickhardiman/script-rhel-setup
 * https://github.com/nickhardiman/ansible-playbook-rhel-lab
 * https://github.com/nickhardiman/ansible-collection-platform
-* https://github.com/nickhardiman/ansible-collection-vm-gateway
 * https://github.com/nickhardiman/ansible-collection-libvirt
+* https://github.com/nickhardiman/ansible-collection-vm-gateway
 
 
+== second attempt, AAP2 refarch
 
+couple years ago
 
+network of virtual machines on three fresh RHEL 9 hosts.
 
-== Requirements
+worked, but an absolute monster 
 
-== Variables
+* https://github.com/nickhardiman/ansible-playbook-aap-lab
+* https://github.com/nickhardiman/ansible-collection-platform
 
-== Dependencies
+== first attempt, RHEL lab
 
-== Example Playbook
+few years ago 
 
-----
-    - hosts: all
-      roles:
-         - ansible-role-template
-----
+network of virtual machines on three fresh RHEL 9 hosts.
 
-
-Run an included playbook like this. 
-
-----
-ansible-playbook nickhardiman.libvirt.install_hypervisor.yml
-----
-
-ISO downloads require an "offline token" (or refresh token).
-Put this in vault-credentials.yml, then 
-
-----
-ansible-playbook --extra-vars=@~/vault-credentials.yml --vault-pass-file=~/my-vault-pass nickhardiman.libvirt.install_hypervisor.yml
-----
-
-
-== License
-
-See license.md
-
-== Author Information
-
+* https://github.com/nickhardiman/ansible-playbook-source
+* https://github.com/nickhardiman/ansible-playbook-build
+* https://github.com/nickhardiman/ansible-playbook-supply
+* https://github.com/nickhardiman/ansible-collection-platform
+* https://github.com/nickhardiman/ansible-collection-app
