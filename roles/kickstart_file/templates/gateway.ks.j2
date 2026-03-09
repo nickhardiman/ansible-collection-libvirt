@@ -23,6 +23,7 @@ keyboard --vckeymap=gb
 
 # network
 # from Ansible group_vars and host_vars
+# one dynamic IP address, one fixed IP address
 network --device=enp1s0 --bootproto=dhcp --ipv6=auto --activate
 network --device=enp2s0 --bootproto=static --ip={{ kickstart_file_config['nics'][1]['ip'] }} --netmask=255.255.255.0 --gateway={{ kickstart_file_config['lab_net_prefix'] }}.1 --nodefroute --activate
 network  --hostname={{ kickstart_file_config['fqdn'] }}
@@ -38,6 +39,10 @@ eula --agreed
 # from the Ansible vault
 # These commands set up password-based login.
 # for key-based login, check out 'sshkey --username=user "ssh_key"'.
+# For changing a password in the "post" section, try one of these.
+#   echo "ansible_user:Password;1" | chpasswd
+#   echo "Password;1" | passwd --stdin ansible_user
+#
 rootpw                                       --iscrypted "{{ kickstart_file_config['user_root_password_encrypted'] }}"
 user --groups=wheel --name={{ kickstart_file_config['user_admin_name'] }}   --password="{{ kickstart_file_config['user_admin_password_encrypted'] }}" --iscrypted --gecos="{{ kickstart_file_config['user_admin_name'] }}"
 user --groups=wheel --name={{ kickstart_file_config['user_ansible_name'] }} --password="{{ kickstart_file_config['user_ansible_password_encrypted'] }}" --iscrypted --gecos="{{ kickstart_file_config['user_ansible_name'] }}"
@@ -83,6 +88,7 @@ reboot
 kexec-tools
 tuned
 # These packages provide a selection of sysadmin tools for manual work.
+bash-color-prompt
 bash-completion
 bind-utils
 cockpit
@@ -129,8 +135,14 @@ restorecon -vR /home/{{ kickstart_file_config['user_admin_name'] }}/.ssh/
 echo "{{ kickstart_file_config['user_admin_name'] }}      ALL=(ALL)       NOPASSWD: ALL" > /etc/sudoers.d/{{ kickstart_file_config['user_admin_name'] }}
 # CLI prompt. Also see "better_prompt" here:
 # https://github.com/nickhardiman/ansible-playbook-aap2-refarch/blob/main/files/aap-bootstrap-1-ssh-sudo.sh
-echo "PS1='[\u@\H \W]$ '" >> /home/{{ kickstart_file_config['user_admin_name'] }}/.bashrc
+# echo "PS1='[\u@\H \W]$ '" >> /home/{{ kickstart_file_config['user_admin_name'] }}/.bashrc
+echo "PROMPT_USERHOST='\u@\H'  # requires RPM bash-color-prompt" >> /home/{{ kickstart_file_config['user_admin_name'] }}/.bashrc
 
+# !!! commands to edit "authorized_keys"?
+# why not use "sshkey" instead?
+#   sshkey --user {{ kickstart_file_config['user_ansible_name'] }} "{{ kickstart_file_config['user_ansible_public_key'] }}"
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html-single/performing_an_advanced_rhel_9_installation/index#sshkey_kickstart-commands-for-system-configuration
+#
 # ansible user
 # key-based login
 mkdir -m0700 /home/{{ kickstart_file_config['user_ansible_name'] }}/.ssh/
@@ -147,7 +159,8 @@ restorecon -vR /home/{{ kickstart_file_config['user_ansible_name'] }}/.ssh/
 echo "{{ kickstart_file_config['user_ansible_name'] }}      ALL=(ALL)       NOPASSWD: ALL" > /etc/sudoers.d/{{ kickstart_file_config['user_ansible_name'] }}
 # CLI prompt. Also see "better_prompt" here:
 # https://github.com/nickhardiman/ansible-playbook-aap2-refarch/blob/main/files/aap-bootstrap-1-ssh-sudo.sh
-echo "PS1='[\u@\H \W]$ '" >> /home/{{ kickstart_file_config['user_ansible_name'] }}/.bashrc
+# echo "PS1='[\u@\H \W]$ '" >> /home/{{ kickstart_file_config['user_ansible_name'] }}/.bashrc
+echo "PROMPT_USERHOST='\u@\H'  # requires RPM bash-color-prompt" >> /home/{{ kickstart_file_config['user_ansible_name'] }}/.bashrc
 
 # root user
 # key-based login
@@ -161,10 +174,10 @@ chmod 0600 /root/.ssh/authorized_keys
 restorecon -vR /root/.ssh/
 # CLI prompt. Also see "better_prompt" here:
 # https://github.com/nickhardiman/ansible-playbook-aap2-refarch/blob/main/files/aap-bootstrap-1-ssh-sudo.sh
-echo "PS1='[\u@\H \W]$ '" >> /root/.bashrc
+# echo "PS1='[\u@\H \W]$ '" >> /root/.bashrc
+echo "PROMPT_USERHOST='\u@\H'  # requires RPM bash-color-prompt" >> /root/.bashrc
 
 # cockpit
 systemctl enable cockpit.socket
 
 %end
-
